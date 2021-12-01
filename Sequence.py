@@ -3,8 +3,8 @@ class Sequence:
      modelliert eine absteigende Sequenz von Karten
     """
 
-    def __init__(self, cards_list):
-        self._cards = cards_list
+    def __init__(self, cards):
+        self._cards = cards
 
     def first_card(self):
         return self._cards[0]
@@ -12,11 +12,11 @@ class Sequence:
     def last_card(self):
         return self._cards[-1]
 
-    #ToDo check Attribut card_in
+    #ToDo check Attribut card_in, bzw ob carten zu einander passen
     #Todo prüfe ob input card dem Standart entspricht lst, values grenzen
     def append_card(self, card):
         return self._cards.append(card)
-
+#first card is
     def fits_in(self, cards):
         return int(self._cards[-1]) == int(cards.first_card()) - 1
 
@@ -24,8 +24,9 @@ class Sequence:
         self._cards += cards_to_merge
 
     def split(self, position):
+        # neue sequenz ?
         return self._cards[position:]
-
+# now only full by value , @TODO full color check
     def is_full(self):
         print("the Length is: ", len(self._cards))
         return len(self._cards) == 14
@@ -43,7 +44,4 @@ if __name__ == "__main__":
     print(s.is_full())
     sec_card = Sequence(l_2)
     print(s.fits_in(sec_card))
-    print()
-    print()
-    print()
-    print()
+

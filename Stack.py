@@ -9,21 +9,22 @@ class Stack:
        """
     '''Konstruktor erwartet eine Card-Instanz, welche die bereits sichtbare Karte reprasentiert
     und eine Liste von Card-Instanzen, welche die noch verdeckten Karten darstellen.'''
-    def __init__(self, sequences, face_down_cards):
+    def __init__(self, face_down_cards, card_open):
         #first list 1 D
-        self._sequences = face_down_cards
+        self._sequences = []
+        self._sequences.apppend(face_down_cards)
         #second list 2D
-        new_lst = [sequences]
-        self._sequences.apppend(sequences)
+        new_lst = [card_open]
+        self._sequences.apppend(card_open)
 
     def last_sequence(self):
-        #in the second dimension are face up cards stored
-        return self._sequences[1][-1]
+        #in the second dimension are face up cards stored [[down], [up]]
+        return self._sequences[1]
 
     def is_empty(self):
         "Prueft, ob dieser Stapel leer ist, es also keine offenen Karten mehr gibt."
         return not self._sequences[1]
-
+#todo check ob value color ok sind
     def append_sequence(self, sequences):
         self._sequences[1].append(sequences)
 
@@ -32,18 +33,23 @@ class Stack:
         Deckt, wenn moeglich, eine neue Karte von den zugedeckten Karten auf.
         Dafuer muss der Stapel leer sein und es muss noch zugedeckte geben.
         """
-        if self.is_empty() and self._face_down_cards:
-            #pop saved always the card value !
-            self.append_sequence(Sequence([self._face_down_cards.pop()]))
-
+        if len(self._sequences[0]) > 0 and len(self._sequences[1]) == 0:
+            self._sequences[1].append(self._sequences[0][-1])
+        elif len(self._sequences[0] == 0):
+            print("Halter ist leer")
+        else:
+            print("Etwas schief gelaufen")
+# only by value but not by color
     def test_fullsequence(self):
         if len(self._sequences[1]) == 14:
             self._sequences[1].pop()
             self._sequences.test_revealcard()
+        else:
+            print("NOT FULL")
 
     def deal_card(self, card):
 
-        if self._sequences[1] == card:
+        if self._sequences[1] == card[1]:
             self._sequences[1].append(card)
             self._sequences[1].test_fullsequence()
         else:
@@ -56,4 +62,6 @@ class Stack:
         return stack_str
 
 
-
+if __name__ == "__main__":
+    l = [1,2,3,4,5,6,7,8,9, 10]
+    m = Stack([1,2,3], 5)

@@ -38,10 +38,8 @@ class Card:
     def __str__(self):
         return uni_cards[self.get_color()][self.get_value()]
 
+#Funktionalyty Test done
 if __name__ == "__main__":
     s = Card(10, "spades")
     s_2 = Card(11, "spades")
     print(s.fits_to(s_2.get_value()))
-
-
-#
