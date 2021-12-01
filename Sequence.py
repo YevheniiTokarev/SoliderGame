@@ -1,6 +1,6 @@
 class Sequence:
     """
-    Diese Klasse modelliert eine absteigende Sequenz von Karten
+     modelliert eine absteigende Sequenz von Karten
     """
 
     def __init__(self, cards_list):

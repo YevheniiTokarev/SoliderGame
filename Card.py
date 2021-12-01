@@ -9,7 +9,7 @@ uni_cards = {
 
 class Card:
     """
-    Eine einzelne Spielkarte, die Informationen bzgl Kartenwert und -Farbe speichert.
+    Modelliert eine Karte
     """
     def __init__(self, value, color):
         self._value = value
@@ -31,16 +31,17 @@ class Card:
 
     def set_color(self, color):
         self._color = color
-# 2D Liste wird benutzt für als Halter für die Karten  lst_1 0 farbe und lst_2 für value
+
+    def fits_to(self, drop_card):
+        return self._value == drop_card - 1
 
     def __str__(self):
         return uni_cards[self.get_color()][self.get_value()]
 
 if __name__ == "__main__":
     s = Card(10, "spades")
-    print(type(s))
-    s.set_value(3)
-    print(type(s) == 'class __main__.Card')
+    s_2 = Card(11, "spades")
+    print(s.fits_to(s_2.get_value()))
 
 
 #
