@@ -5,19 +5,16 @@ class Stack:
     """
        Ein Stapel von Sequenzen. Diese Klasse modelliert die einzelnen Stapel des Spiels.
        Neben den Sequenzen, welche den aufgedeckten Karten entsprechen, merkt sich ein Stapel noch die umgedrehten/verdeckten Karten.
-       umgedrehte kartes sind immer 1 element !  [[gedeckte][ungedekte]]
-       es können mehrere seq in einem Stack drin sein.
-       -------------2D List Verwalten----------------------
-       """
+    """
+
     '''Konstruktor erwartet eine Card-Instanz, welche die bereits sichtbare Karte reprasentiert
     und eine Liste von Card-Instanzen, welche die noch verdeckten Karten darstellen.'''
     def __init__(self, face_down_cards, card_open):
         #first list 1 D
-        self._sequences = []
-        self._sequences.apppend(face_down_cards)
-        #second list 2D
-        new_lst = [card_open]
-        self._sequences.apppend(card_open)
+        new_sequence = [card_open]
+        self._sequences.apppend(new_sequence)
+        self._face_down_cards = face_down_cards
+
 
     def last_sequence(self):
         #in the second dimension are face up cards stored [[down], [up]]

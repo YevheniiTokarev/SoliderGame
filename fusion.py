@@ -9,11 +9,13 @@ uni_cards = {
     'face_down': chr(127136)
 }
 
+
 def create_cards(numbers, value):
     cards = []
     for i  in range(numbers[0], numbers[1] + 1):
         cards.append(Card(i, value))
     return cards
+
 
 class Card:
     """
@@ -53,7 +55,7 @@ class Card:
         return uni_cards[self.get_color()][self.get_value()]
 
 
-class Sequence:
+class Sequence(Card):
     """
      modelliert eine absteigende Sequenz von Karten
     """
@@ -76,20 +78,22 @@ class Sequence:
         # return nötig ?
         self._cards.append(card)
 
-# first card is
+# how to use self._cards.last_card.get_value()
     def fits_to(self, cards):
-        return int(self._cards.last_card.get_value()) - 1 == int(cards.first_card().get_value())
+        print("last", self.last_card().get_value())
+        print("first", cards.first_card().get_value())
+        return self.last_card().get_value() - 1 == cards.first_card().get_value()
 
     def merge(self, cards_to_merge):
         # fits to nötig ??
         # neue sequenz oder bestehende soll erweitert werden
-        if self._cards.fits_to(cards_to_merge):
+        if self.fits_to(cards_to_merge):
             self._cards += cards_to_merge
         else:
             print("SEC ERROR : Erste Karte aus der eingehende Seq passt nicht")
 
     def split(self, index):
-        # neue sequenz zurückgibt, überschreibt slicing ?
+        # neue sequenz zurückgibt, überschreibt slicing --> Nein
         return self._cards[index:]
     '''
     seq full wenn : 13 karten und alle farben sind gleich
@@ -100,11 +104,11 @@ class Sequence:
         is_full = False
         # wenn die länge 14 ist iteririe von ende bis 14 solange die Folge passt
         if len(self._cards) == 13 and \
-                self._cards.first_card().get_value() == 13 and\
-                self._cards.last_card().get_value() == 1 and\
-                self._cards.first_card().get_color() == self._cards.last_card().get_color():
+                self.first_card().get_value() == 13 and\
+                self.last_card().get_value() == 1 and\
+                self.first_card().get_color() == self.last_card().get_color():
             for i in range(1, 12):
-                if self._cards.get_card_seq(i).get_color() == self._cards.get_card_seq(i + 1).get_color():
+                if self.get_card_seq(i).get_color() == self.get_card_seq(i + 1).get_color():
                     is_full = True
                 else:
                     is_full = False
@@ -119,15 +123,93 @@ class Sequence:
         return "-".join(map(str, self._cards))
 
 
+class Stack(Sequence):
+        """
+           Ein Stapel von Sequenzen. Diese Klasse modelliert die einzelnen Stapel des Spiels.
+           Neben den Sequenzen, welche den aufgedeckten Karten entsprechen, merkt sich ein Stapel noch die umgedrehten/verdeckten Karten.
+        """
+
+        '''Konstruktor erwartet eine Card-Instanz, welche die bereits sichtbare Karte reprasentiert
+        und eine Liste von Card-Instanzen, welche die noch verdeckten Karten darstellen.'''
+        def __init__(self, face_down_cards, card_open):
+            new_sequence = [card_open]
+            # create a new sequence
+            self._sequences.apppend(Sequence(new_sequence))
+            self._face_down_cards = face_down_cards
+
+        def last_sequence(self):
+            return self._sequences[-1]
+
+        def is_empty(self):
+            return not self._sequences[0]
+
+        # todo check ob value color ok sind, benutze funktionen von anderen Klassen
+        def append_sequence(self, sequences):
+            self._sequences.append(sequences)
+
+        def test_revealcard(self):
+            """
+            Deckt, wenn moeglich, eine neue Karte von den zugedeckten Karten auf.
+            Dafuer muss der Stapel leer sein und es muss noch zugedeckte geben.
+            """
+            if self.is_empty() and len(self._face_down_cards) != 0:
+                new_sequence = self._face_down_cards.pop()
+                self._sequences.apppend(Sequence(new_sequence))
+            else:
+                print("Stack ist komplett leer! Karte kann nicht aufgedeckt werden ")
+
+
+        def test_full_sequence(self):
+            if self.last_sequence().is_full():
+                self._sequences.pop()
+                self.test_revealcard()
+            else:
+                print("Sequence is not full ...")
+
+
+        def deal_card(self, card):
+            if self.last_sequence().last_card().fits_to(card):
+                self.last_sequence().append_card(card)
+                self.test_full_sequence()
+            else:
+                print("Karte passt nicht, wird neue Seq erzeugt")
+                new_sequence = [card]
+                self._sequences.apppend(Sequence(new_sequence))
+
+        def __str__(self):
+            stack_str = " ".join(len(self._face_down_cards) * uni_cards['face_down']) + " "
+            stack_str += " ".join(map(str, self._sequences))
+            return stack_str
+
 
 if __name__ == "__main__":
+    card_1 = Card(2, "hearts")
+    card_2 = Card(3, "hearts")
+    card_3 = Card
     game_cards_hears_1 = []
     game_cards_hears_2 = []
     # Borders are inklusiv
     game_cards_hears_1 = create_cards([1, 8], "hearts")
     game_cards_hears_2 = create_cards([9, 13], "hearts")
+
     seq_1 = Sequence(game_cards_hears_1)
-    seq_2 = Sequence(game_cards_hears_1)
+    print("Seq 1 first bevor: ", seq_1.first_card().get_value())
+    print("Seq 1 first bevor: ", seq_1.last_card().get_value())
+    #TODo : funktion anpassen so dass es fits to aus Klasse Card ausgeführt wird
+    seq_1.append_card(card_1)
+    print("Seq 1 first after: ", seq_1.first_card().get_value())
+    print("Seq 1 first after: ", seq_1.last_card().get_value())
 
+    print(seq_1.split(5))
+    print(seq_1)
 
+    seq_2 = Sequence(game_cards_hears_2)
+    print("Seq 2 first bevor: ", seq_2.first_card().get_value())
+    print("Seq 2 last bevor: ", seq_2.last_card().get_value())
+    seq_2.append_card(card_2)
+    print("Seq 2 first after: ", seq_2.first_card().get_value())
+    print("Seq 2 last after: ", seq_2.last_card().get_value())
+
+    seq_1.merge(seq_2)
+    print(seq_1)
 
