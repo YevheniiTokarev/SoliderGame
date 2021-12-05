@@ -6,6 +6,8 @@ class Stack:
        Ein Stapel von Sequenzen. Diese Klasse modelliert die einzelnen Stapel des Spiels.
        Neben den Sequenzen, welche den aufgedeckten Karten entsprechen, merkt sich ein Stapel noch die umgedrehten/verdeckten Karten.
        umgedrehte kartes sind immer 1 element !  [[gedeckte][ungedekte]]
+       es können mehrere seq in einem Stack drin sein.
+       -------------2D List Verwalten----------------------
        """
     '''Konstruktor erwartet eine Card-Instanz, welche die bereits sichtbare Karte reprasentiert
     und eine Liste von Card-Instanzen, welche die noch verdeckten Karten darstellen.'''
@@ -22,9 +24,9 @@ class Stack:
         return self._sequences[1]
 
     def is_empty(self):
-        "Prueft, ob dieser Stapel leer ist, es also keine offenen Karten mehr gibt."
+        # wenn die zweite Liste leer ist --> keine offene Karten
         return not self._sequences[1]
-#todo check ob value color ok sind
+#todo check ob value color ok sind, benutze funktionen von anderen Klassen
     def append_sequence(self, sequences):
         self._sequences[1].append(sequences)
 
@@ -41,6 +43,11 @@ class Stack:
             print("Etwas schief gelaufen")
 # only by value but not by color
     def test_fullsequence(self):
+        @TODO !!!!!!!!!!!
+        '''seq_number = len(self._sequences[1])
+        if seq_number > 0:
+            for i in self._sequences[1]:
+                 '''
         if len(self._sequences[1]) == 14:
             self._sequences[1].pop()
             self._sequences.test_revealcard()
@@ -48,13 +55,16 @@ class Stack:
             print("NOT FULL")
 
     def deal_card(self, card):
-
-        if self._sequences[1] == card[1]:
-            self._sequences[1].append(card)
+        # [[nS1, nS2, nS3],[[S1,S2,S3],[S1,S2,S3]],]
+        # opencards-->last seq-->last card-->value of card
+        if self._sequences[1][-1][-1][-1] == card[1]:
+            self._sequences[1][-1].append(card)
             self._sequences[1].test_fullsequence()
         else:
-            #create new sequency
-            pass
+            self._sequences[1].append(card)
+            print("New card was added")
+
+
 
     def __str__(self):
         stack_str = " ".join(len(self._face_down_cards) * uni_cards['face_down']) + " "
