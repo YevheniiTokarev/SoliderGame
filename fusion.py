@@ -24,7 +24,7 @@ class Card:
     def __init__(self, value, color):
         self._value = value
         self._color = color
-        # if type(self._value) type(self._color)
+        # lieber while solange nicht richtig
         if self._value < 1 or self._value > 13:
             raise Exception("The card Value is false", self._value)
         if self._color != "hearts" and self._color != "spades":
@@ -68,17 +68,18 @@ class Sequence(Card):
 
     def last_card(self):
         return self._cards[-1]
-
+#slicing?! function ?
     def get_card_seq(self, index):
         return self._cards[index]
 
     # ToDo check Attribut card_in, bzw ob carten zu einander passen
     # Todo prüfe ob input card dem Standart entspricht lst, values grenzen
+    #wenn es nur für start austeilung benötigt wird , dann obere Anmerkungen sind  unwichitg ..
     def append_card(self, card):
-        # return nötig ?
         self._cards.append(card)
 
 # how to use self._cards.last_card.get_value()
+    #schreibe separat 2 funktionen fits to value fits to color fit_value().fitcolor()...
     def fits_to(self, cards):
         print("last", self.last_card().get_value())
         print("first", cards.first_card().get_value())
@@ -130,30 +131,35 @@ class Stack(Sequence):
         """
 
         '''Konstruktor erwartet eine Card-Instanz, welche die bereits sichtbare Karte reprasentiert
-        und eine Liste von Card-Instanzen, welche die noch verdeckten Karten darstellen.'''
+        und eine Liste von Card-Instanzen, welche die noch verdeckten Karten darstellen.
+        Aufbau --> [seq_face_down, Seq_face_open]'''
         def __init__(self, face_down_cards, card_open):
+            #zu erst soll geprüft werden ob es zu aktueller seq passt, es soll aber in solder klasse gemacht werden
             new_sequence = [card_open]
-            # create a new sequence
-            self._sequences.apppend(Sequence(new_sequence))
             self._face_down_cards = face_down_cards
+            # create a new sequence for face down
+            self._sequences.apppend(Sequence(self._face_down_cards))
+            self._sequences.apppend(Sequence(new_sequence))
+
 
         def last_sequence(self):
             return self._sequences[-1]
 
         def is_empty(self):
-            return not self._sequences[0]
+            return len(self._sequences) == 0
 
         # todo check ob value color ok sind, benutze funktionen von anderen Klassen
-        def append_sequence(self, sequences):
-            self._sequences.append(sequences)
+        def append_sequence(self, sequence):
+            self._sequences.append(sequence)
 
         def test_revealcard(self):
             """
             Deckt, wenn moeglich, eine neue Karte von den zugedeckten Karten auf.
             Dafuer muss der Stapel leer sein und es muss noch zugedeckte geben.
+            [ seq_face_down, seq_up_1, seq_up_2 ..] if seq_face_down not empty and seq_up_1 is empty  and full stack not empty
             """
-            if self.is_empty() and len(self._face_down_cards) != 0:
-                new_sequence = self._face_down_cards.pop()
+            if not self.is_empty() and len(self._sequences[0]) > 0 and len(self._sequences[1]) == 0:
+                new_sequence = list(self._sequences[0].last_card().pop())
                 self._sequences.apppend(Sequence(new_sequence))
             else:
                 print("Stack ist komplett leer! Karte kann nicht aufgedeckt werden ")
@@ -180,6 +186,43 @@ class Stack(Sequence):
             stack_str = " ".join(len(self._face_down_cards) * uni_cards['face_down']) + " "
             stack_str += " ".join(map(str, self._sequences))
             return stack_str
+
+
+class SpiderSolitaire(Stack):
+    def __init__(self, stacks, stack2deal):
+        self._stacks = stacks
+        # Liste von Card-Instanzen, der noch zu verteilenden Karten,
+        self._stack2deal = Sequence(stack2deal)
+
+    def is_empty_stacks(self):
+        empty = False
+        for i in self._stacks:
+            #i[0] sind face down cards
+            if len(i[0]) == 0:
+                empty = True
+                break
+        return empty
+
+    def deal(self):
+        if len(self._stack2deal) != 0 and self.is_empty_stacks():
+            # run into each stack
+            for i in self._stacks:
+                # run into each seq in the stack
+                for j in i:
+                    j.append(self._stack2deal.pop())
+                    if len(self._stack2deal) == 0:
+                        print("Stack2Deal empty")
+                        break
+        else:
+            print("Stack2Deal is leer oder Karte nicht aufgedeckt ist!")
+
+    def __str__(self):
+        res = ""
+        for i, stack in enumerate(self.stacks):
+            res += str(i) + "" + str(stack) + "\n"
+        res += "#" * 80 + "\n"
+        return res
+
 
 
 if __name__ == "__main__":
