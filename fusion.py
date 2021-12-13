@@ -43,13 +43,11 @@ class Card:
         self._color = color
 
         # Todo this form drop_card = card [value, color]
-    def fits_to(self, drop_card):
-        # value_only = self._color == drop_card[1]:
-        value_only = False
-        if self._color != drop_card.get_color():
-            if self._value - 1 == drop_card.get_value():
-                value_only = True
-        return value_only
+    def fits_to(self, drop_card, value_only=False):
+        if value_only:
+            return self._value - 1 == drop_card.get_value() and self._color != drop_card.get_color()
+        else:
+            return self._value - 1 == drop_card.get_value() and self._color == drop_card.get_color()
 
     def __str__(self):
         return uni_cards[self.get_color()][self.get_value()]
@@ -123,6 +121,9 @@ class Sequence(Card):
         # umwandlung card element zu String
         return "-".join(map(str, self._cards))
 
+    def __iter__(self):
+        pass
+
 
 class Stack(Sequence):
         """
@@ -186,6 +187,15 @@ class Stack(Sequence):
             stack_str = " ".join(len(self._face_down_cards) * uni_cards['face_down']) + " "
             stack_str += " ".join(map(str, self._sequences))
             return stack_str
+
+        def __iter__(self):
+            yield self.get_cards()
+
+#use generator, We can use more than one yield statement in a generator.
+        def get_cards(self):
+            for i in self._self._sequences:
+                for j in i:
+                    yield j
 
 
 class SpiderSolitaire(Stack):
