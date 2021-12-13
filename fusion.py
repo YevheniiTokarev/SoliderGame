@@ -78,22 +78,21 @@ class Sequence(Card):
 
 # how to use self._cards.last_card.get_value()
     #schreibe separat 2 funktionen fits to value fits to color fit_value().fitcolor()...
-    def fits_to(self, cards):
+    def fits_to(self, cards, value_only=False):
         print("last", self.last_card().get_value())
         print("first", cards.first_card().get_value())
-        return self.last_card().get_value() - 1 == cards.first_card().get_value()
+        return self.last_card().fits_to(cards.first_card(), value_only=value_only)
 
     def merge(self, cards_to_merge):
-        # fits to nötig ??
-        # neue sequenz oder bestehende soll erweitert werden
-        if self.fits_to(cards_to_merge):
-            self._cards += cards_to_merge
-        else:
-            print("SEC ERROR : Erste Karte aus der eingehende Seq passt nicht")
+        self._cards += cards_to_merge
 
     def split(self, index):
-        # neue sequenz zurückgibt, überschreibt slicing --> Nein
-        return self._cards[index:]
+        splitted = Sequence(self._cards[index:])
+        self._cards[:] = self._cards[:index]
+        return splitted
+        #if splitted.is_full():
+         #   raise SpiderSolitaireError("Splitted an empty Sequence")
+
     '''
     seq full wenn : 13 karten und alle farben sind gleich
     wenn die erste karte ist 13 und die letzte ist 1 
@@ -117,12 +116,16 @@ class Sequence(Card):
             print("Sequence is not full, check length, firs/last Card")
         return is_full
 
+    def is_empty(self):
+        return not self._cards
+
     def __str__(self):
         # umwandlung card element zu String
         return "-".join(map(str, self._cards))
 
     def __iter__(self):
-        pass
+        for card in self._cards:
+            yield card
 
 
 class Stack(Sequence):
