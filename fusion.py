@@ -138,23 +138,20 @@ class Stack(Sequence):
         und eine Liste von Card-Instanzen, welche die noch verdeckten Karten darstellen.
         Aufbau --> [seq_face_down, Seq_face_open]'''
         def __init__(self, face_down_cards, card_open):
-            #zu erst soll geprüft werden ob es zu aktueller seq passt, es soll aber in solder klasse gemacht werden
-            new_sequence = [card_open]
+            self._sequences = Sequence([card_open])
             self._face_down_cards = face_down_cards
-            # create a new sequence for face down
-            self._sequences.apppend(Sequence(self._face_down_cards))
-            self._sequences.apppend(Sequence(new_sequence))
-
 
         def last_sequence(self):
             return self._sequences[-1]
 
         def is_empty(self):
-            return len(self._sequences) == 0
+            return not self._sequences
 
-        # todo check ob value color ok sind, benutze funktionen von anderen Klassen
         def append_sequence(self, sequence):
             self._sequences.append(sequence)
+
+        def del_last_sequece(self):
+            self._sequences.pop()
 
         def test_revealcard(self):
             """
@@ -162,9 +159,8 @@ class Stack(Sequence):
             Dafuer muss der Stapel leer sein und es muss noch zugedeckte geben.
             [ seq_face_down, seq_up_1, seq_up_2 ..] if seq_face_down not empty and seq_up_1 is empty  and full stack not empty
             """
-            if not self.is_empty() and len(self._sequences[0]) > 0 and len(self._sequences[1]) == 0:
-                new_sequence = list(self._sequences[0].last_card().pop())
-                self._sequences.apppend(Sequence(new_sequence))
+            if self.is_empty() and self._face_down_cards:
+                self.append_sequence((Sequence[self._face_down_cards.pop()]))
             else:
                 print("Stack ist komplett leer! Karte kann nicht aufgedeckt werden ")
 
@@ -178,7 +174,8 @@ class Stack(Sequence):
 
 
         def deal_card(self, card):
-            if self.last_sequence().last_card().fits_to(card):
+            last_card = self.last_sequence().last_card()
+            if card.fits_to(last_card):
                 self.last_sequence().append_card(card)
                 self.test_full_sequence()
             else:
@@ -191,11 +188,8 @@ class Stack(Sequence):
             stack_str += " ".join(map(str, self._sequences))
             return stack_str
 
-        def __iter__(self):
-            yield self.get_cards()
-
 #use generator, We can use more than one yield statement in a generator.
-        def get_cards(self):
+        def __iter__(self):
             for i in self._self._sequences:
                 for j in i:
                     yield j
